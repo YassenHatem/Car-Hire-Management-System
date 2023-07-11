@@ -25,11 +25,11 @@ class DBManager:
 
     def __init__(self, connection_string):
         """
-        Initialize the CRUDOperations instance with the given connection string.
+        Initialize the DBManager instance with the given connection string.
         """
         self.db = DatabaseConnection(connection_string).connection
 
-    def create_record(self, db_name, table_name, data):
+    def create_record(self, table_name, data):
         """
         Create a new record in the specified database table with the given data.
         """
@@ -39,7 +39,7 @@ class DBManager:
             columns = ', '.join(data.keys())
             values = ', '.join(['%s'] * len(data))
 
-            query = f"INSERT INTO {db_name}.{table_name} ({columns}) VALUES ({values})"
+            query = f"INSERT INTO {table_name} ({columns}) VALUES ({values})"
             values = tuple(data.values())
 
             cursor.execute(query, values)
@@ -50,16 +50,16 @@ class DBManager:
         finally:
             cursor.close()
 
-    def read_records(self, db_name, table_name):
+    def read_record(self, table_name, identifier):
         """
-        Retrieve all records from the specified database table.
+        Retrieve record from the specified database table.
         """
         cursor = self.db.cursor()
 
         try:
-            query = f"SELECT * FROM {db_name}.{table_name}"
+            query = f"SELECT * FROM {table_name} WHERE id=%s"
 
-            cursor.execute(query)
+            cursor.execute(query, (identifier,))
             rows = cursor.fetchall()
 
             return rows
@@ -68,7 +68,7 @@ class DBManager:
         finally:
             cursor.close()
 
-    def update_record(self, db_name, table_name, record_id, new_data):
+    def update_record(self, table_name, record_id, new_data):
         """
         Update the specified record in the database table with the new data.
         """
@@ -79,7 +79,7 @@ class DBManager:
             values = tuple(new_data.values())
             values += (record_id,)
 
-            query = f"UPDATE {db_name}.{table_name} SET {set_values} WHERE id = %s"
+            query = f"UPDATE {table_name} SET {set_values} WHERE id = %s"
 
             cursor.execute(query, values)
             self.db.commit()
@@ -89,14 +89,14 @@ class DBManager:
         finally:
             cursor.close()
 
-    def delete_record(self, db_name, table_name, record_id):
+    def delete_record(self, table_name, record_id):
         """
         Delete the specified record from the database table.
         """
         cursor = self.db.cursor()
 
         try:
-            query = f"DELETE FROM {db_name}.{table_name} WHERE id = %s"
+            query = f"DELETE FROM {table_name} WHERE id = %s"
             values = (record_id,)
 
             cursor.execute(query, values)
