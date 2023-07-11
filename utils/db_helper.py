@@ -62,15 +62,7 @@ class DBManager:
             cursor.execute(query)
             rows = cursor.fetchall()
 
-            records = []
-            for row in rows:
-                record = {
-                    'column1': row[0],
-                    'column2': row[1]
-                }
-                records.append(record)
-
-            return records
+            return rows
         except mysql.connector.Error as error:
             print(f"Error occurred: {error}")
         finally:
