@@ -1,20 +1,20 @@
 import mysql.connector
 
 
-class DatabaseConnection:
+class _DatabaseConnection:
     """
     Singleton class for managing the database connection.
     """
 
     _instance = None
 
-    def __new__(cls, connection_string):
+    def __new__(cls, **kwargs):
         """
         Create a new instance of the class if it doesn't exist, or return the existing instance.
         """
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance.connection = mysql.connector.connect(**connection_string)
+            cls._instance.connection = mysql.connector.connect(**kwargs)
         return cls._instance
 
 
@@ -23,11 +23,11 @@ class DBManager:
     Class for performing CRUD operations on a MySQL database.
     """
 
-    def __init__(self, connection_string):
+    def __init__(self, host, port, user, password, database):
         """
         Initialize the DBManager instance with the given connection string.
         """
-        self.db = DatabaseConnection(connection_string).connection
+        self.db = _DatabaseConnection(host=host, port=port, user=user, password=password, database=database).connection
 
     def create_record(self, table_name, data):
         """
